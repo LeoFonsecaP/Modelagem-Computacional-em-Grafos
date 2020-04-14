@@ -140,7 +140,7 @@ grafo* criar_grafo(int v){
     return g;
 }
 
-//Função que apaga o grafo, recebendo-o como parametro e com retorno void
+//Função que apaga o grafo, recebendo-o como parâmetro e com retorno void
 void apaga_grafo(grafo* g){
       for(int i = 0; i<g->vertices; i++){
         lista_apagar(&g->l[i]);
@@ -149,7 +149,7 @@ void apaga_grafo(grafo* g){
     return;
 }
 
-//Função que insere uma aresta entre dois vertices, recebendo-os como parametro, junto com o grafo, e com retorno void
+//Função que insere uma aresta entre dois vertices, recebendo-os como parâmetro, junto com o grafo, e com retorno void
 void insere_aresta(grafo* g, int a1, int a2){
     if(verfica_aresta(g, a1,a2) == false){
         inserir_lista(g->l[a1], a2);
@@ -159,7 +159,7 @@ void insere_aresta(grafo* g, int a1, int a2){
     return;
 }
 
-//Função que retira uma aresta entre dois vertices, recebendo-os como parametro, junto com o grafo, e com retorno void
+//Função que retira uma aresta entre dois vertices, recebendo-os como parâmetro, junto com o grafo, e com retorno void
 void remove_aresta(grafo* g, int a1, int a2){
     remover_lista(g->l[a1], a2);
     remover_lista(g->l[a2], a1);
@@ -167,12 +167,12 @@ void remove_aresta(grafo* g, int a1, int a2){
     return;
 }
 
-//Função que verifica a existencia de uma aresta entre dois vertices, que recebe como parametro, junto com o grafo, e tem retorno booleano
+//Função que verifica a existencia de uma aresta entre dois vertices, que recebe como parâmetro, junto com o grafo, e tem retorno booleano
 boolean verfica_aresta(grafo* g, int a1, int a2){
     return lista_busca(g->l[a1], a2);
 }
 
-//Função que imprime o grafo, recebendo-o como parametro e com retorno void
+//Função que imprime o grafo, recebendo-o como parâmetro e com retorno void
 void imprime_grafo(grafo* g){
     int tam = g->vertices;
     for(int i = 0; i<tam; i++){
@@ -184,7 +184,7 @@ void imprime_grafo(grafo* g){
     return;
 }
 
-//Função que verifica se o vertice recebido por parametro, junto com o grafo, tem alguma adjacencia e tem retorno booleano
+//Função que verifica se o vertice recebido por parâmetro, junto com o grafo, tem alguma adjacencia e tem retorno booleano
 boolean verifica_adj(grafo* g, int v){
     if(g->l[v]->tamanho != 0){
         return true;
@@ -193,6 +193,56 @@ boolean verifica_adj(grafo* g, int v){
         return false;
     }
 }
+//Função auxiliar da função augoritmo de Fleury, verfica se existe algum vértice com grau ímpar. Recebe o grafo por parâmetro e tem retorno booleano
+boolean verfica_vertice(grafo* g){
+    for(int i = 0; i<g->vertices; i++){
+        if(g->l[i]->tamanho%2 != 0){//verifica se o tamanho da lista de adjacencia de um vértice é diferente de 0
+            return false;
+        }
+    }
+    return true;
+}
 
-
+//Função recursiva auxiliar da função augoritmo de Fleury, recebe o grafo, o vetor caminho, vértice atual e quantos vértices ja estão no caminho como parâmetro. Tem retorno void
+void acha_caminho(grafo* g, int* caminho, int v, int posicao){
+    if(g->arestas == 0){
+        return;
+    }
+    item* p = g->l[v]->ini;
+    while (p != NULL){
+        if(verifica_ponte(g, p->indice) == false){
+            break;
+        }
+        else{
+            p = p->prox;
+        }
+    }
+    if(p == NULL){
+        remove_aresta(g, v, g->l[v]->ini->indice);
+        caminho[posicao] = g->l[v]->ini->indice;
+        posicao++
+        acha_caminho(g, caminho, g->l[v]->ini->indice, posicao);
+    }
+    else{
+        remove_aresta(g, v, p->indice);
+        caminho[posicao] = p->indice;
+        posicao++;
+        acha_caminho(g, caminho, p->indice, posicao);
+    }
+}
+//Função que analisa o grafo, recebido por parâmetro e retorna um vetor com o caminho euclidiano
+int* algoritmo_de_Fleury(grafo* g){
+    if(verfica_vertice == true){
+        return NULL;
+    }
+    else{
+        grafo* aux = g;
+        int* caminho = malloc((g->arestas+1)*sizeof(int));
+        int posicao = 0;
+        caminho[posicao] = 0;
+        posicao++;
+        acha_caminho(aux, caminho, 0, posicao);
+    }
+    return caminho;
+}
 

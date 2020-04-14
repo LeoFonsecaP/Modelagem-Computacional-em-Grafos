@@ -25,5 +25,6 @@
     boolean verfica_aresta(grafo* g, int a1, int a2); //verifica a existencia de uma aresta entre dois vertices
     void imprime_grafo(grafo* g); //Imprime as listas de adjacencia
     boolean verifica_adj(grafo* g, int v); //Verifica se o vértice tem alguma adjacencia
+    int* algoritmo_de_Fleury(grafo* g); //Identifica um caminho euclidiano
     #endif
 
