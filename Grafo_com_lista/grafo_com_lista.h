@@ -22,9 +22,10 @@
     void insere_aresta(grafo* g, int a1, int a2); //Insere uma aresta
     void remove_aresta(grafo* g, int a1, int a2); //Remove uma aresta
     void apaga_grafo(grafo* g); //Apaga o grafo
-    boolean verfica_aresta(grafo* g, int a1, int a2); //verifica a existencia de uma aresta entre dois vertices
+    boolean verifica_aresta(grafo* g, int a1, int a2); //verifica a existencia de uma aresta entre dois vertices
     void imprime_grafo(grafo* g); //Imprime as listas de adjacencia
     boolean verifica_adj(grafo* g, int v); //Verifica se o vértice tem alguma adjacencia
     int* algoritmo_de_Fleury(grafo* g); //Identifica um caminho euclidiano
+    void coloracao(grafo*g);//Colore o grafo
     #endif
 

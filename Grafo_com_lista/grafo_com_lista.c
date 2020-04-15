@@ -19,6 +19,7 @@ struct lista_ {
 struct grafo_{
     int arestas;
     int vertices;
+    int* cor;
     LISTA** l; //Vetor das listas de adjacencia
 };
 
@@ -132,9 +133,11 @@ grafo* criar_grafo(int v){
     if(g != NULL){
         g->arestas = 0;
         g->vertices = v;
+        g->cor = malloc(v* sizeof(int));
         g->l = malloc(v* sizeof(LISTA*));
         for(int i = 0; i<v; i++){
             g->l[i] = lista_criar();
+            g->cor[i] = -1;
         }
     }
     return g;
@@ -142,16 +145,17 @@ grafo* criar_grafo(int v){
 
 //Função que apaga o grafo, recebendo-o como parâmetro e com retorno void
 void apaga_grafo(grafo* g){
-      for(int i = 0; i<g->vertices; i++){
+    for(int i = 0; i<g->vertices; i++){
         lista_apagar(&g->l[i]);
     }
+    free(g->cor);
     free(g);
     return;
 }
 
 //Função que insere uma aresta entre dois vertices, recebendo-os como parâmetro, junto com o grafo, e com retorno void
 void insere_aresta(grafo* g, int a1, int a2){
-    if(verfica_aresta(g, a1,a2) == false){
+    if(verifica_aresta(g, a1,a2) == false){
         inserir_lista(g->l[a1], a2);
         inserir_lista(g->l[a2], a1);
         g->arestas++;
@@ -168,7 +172,7 @@ void remove_aresta(grafo* g, int a1, int a2){
 }
 
 //Função que verifica a existencia de uma aresta entre dois vertices, que recebe como parâmetro, junto com o grafo, e tem retorno booleano
-boolean verfica_aresta(grafo* g, int a1, int a2){
+boolean verifica_aresta(grafo* g, int a1, int a2){
     return lista_busca(g->l[a1], a2);
 }
 
@@ -220,7 +224,7 @@ void acha_caminho(grafo* g, int* caminho, int v, int posicao){
     if(p == NULL){
         remove_aresta(g, v, g->l[v]->ini->indice);
         caminho[posicao] = g->l[v]->ini->indice;
-        posicao++
+        posicao++;
         acha_caminho(g, caminho, g->l[v]->ini->indice, posicao);
     }
     else{
@@ -232,7 +236,7 @@ void acha_caminho(grafo* g, int* caminho, int v, int posicao){
 }
 //Função que analisa o grafo, recebido por parâmetro e retorna um vetor com o caminho euclidiano
 int* algoritmo_de_Fleury(grafo* g){
-    if(verfica_vertice == true){
+    if(verfica_vertice(g) == true){
         return NULL;
     }
     else{
@@ -242,7 +246,55 @@ int* algoritmo_de_Fleury(grafo* g){
         caminho[posicao] = 0;
         posicao++;
         acha_caminho(aux, caminho, 0, posicao);
+        return caminho;
     }
-    return caminho;
 }
-
+//Função auxiliar à função coloração. Recebe um grafo por parâmetro e retorna um vetor com os índices ordenados de forma decrescente de acordo com o grau
+int* grau_ordenado(grafo* g){
+    int* grau = malloc(g->vertices* sizeof(int));
+    int aux;
+    for(int i = 0; i<g->vertices; i++){
+        grau[i] = i;
+    }
+    for(int i = 0; i<g->vertices; i++){
+        for(int j = i+1; j<g->vertices; j++){
+            if(g->l[j]->tamanho > g->l[i]->tamanho){
+                aux = i;
+                i = j;
+                j = i;
+            }
+        }
+    }
+    return grau;
+}
+//Função que colora o grafo recebido por parâmetro de modo que vértices adjacentes tem cores diferentes
+void coloracao(grafo*g){
+    int* ordenado = grau_ordenado(g);
+    int i = 0;//índice do vetor
+    int colorido = 0;//Conta quantos vértices ja foram coloridos para condição de parada
+    int aux = 0;//Usado para análise de adjacentes
+    int c= 0; //índice da cor
+    while(colorido < g->vertices){
+        if(g->cor[ordenado[i]] == -1){//Verifica se aquele vértice ja foi colorido
+            g->cor[ordenado[i]] = c;
+            colorido++;
+            for(int j = i + 1; j<g->vertices; j++){
+                if(g->cor[ordenado[j]] == -1 && verifica_aresta(g, i, j) == false){//Verifica se o vértice ja foi colorido ou tem adjacencia ao vértice que foi colorido inicialmente
+                    for(int k = i+1; k<j; k++){
+                        if(g->cor[k] == c && verifica_aresta(g, j, k)){//Verifica se algum vértice daquela cor tem adjacencia com o vértice que queremos colorir
+                            aux = 1;
+                            break;
+                        }
+                    }
+                    if(aux == 0){
+                        g->cor[ordenado[i]] == c;
+                        colorido++;
+                    }
+                }
+            }
+            aux = 0;
+            c++;
+        }
+        i++;
+    }
+}
