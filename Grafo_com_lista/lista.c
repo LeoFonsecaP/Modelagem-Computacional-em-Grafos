@@ -8,6 +8,8 @@
 
 struct item_{
     int indice;
+    int peso;
+    int dist;
     item* prox;
 };
 
@@ -55,6 +57,30 @@ void inserir_lista(LISTA* l, int v){
     }
     item* aux = malloc(sizeof(item));
     aux->indice = v;
+    aux->dist = 1;
+    aux->peso = 1;
+    aux->prox = NULL;
+    if(l->ini == NULL){
+        l->ini = aux;
+    }
+    if(l->fim != NULL){
+        l->fim->prox = aux;
+    }
+    l->fim = aux;
+    l->tamanho++;
+    return;
+}
+
+/* Insere um elemento v, com peso p e distancia d, recebidos por parametro, 
+ * na lista l, que tambem e um parametro. Retorno void. */
+void inserir_lista_com_peso(LISTA* l, int v, int p, int d){
+    if(l == NULL){
+        return;
+    }
+    item* aux = malloc(sizeof(item));
+    aux->indice = v;
+    aux->dist = d;
+    aux->peso = p;
     aux->prox = NULL;
     if(l->ini == NULL){
         l->ini = aux;
@@ -171,4 +197,39 @@ item* ponteiro_lista(LISTA*l, item* p){
 
 int indice_item(item* i){
     return (i->indice);
+}
+
+//Retorna a distancia do item na posicao P
+int lista_getDist(LISTA* l, int p){
+    if(p > l->tamanho){
+        return -1;
+    }
+    if(p == l->tamanho){
+        return l->fim->indice;
+    }
+    item* aux = l->ini;
+    for(int i = 0; i < p; i++){
+        aux = aux->prox;
+    }
+    return aux->dist;
+}
+
+//Retorna o peso do item v
+int lista_getPeso(LISTA* l, int v){
+    if(l == NULL){
+        return -1;
+    }
+    item* aux = l->ini;
+    while(aux != NULL){
+        if(aux->indice == v){
+            break;
+        }
+        else{
+            aux = aux->prox;
+        }
+    }
+    if(aux != NULL){
+        return aux->peso;
+    }
+    return -1;
 }

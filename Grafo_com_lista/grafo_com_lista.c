@@ -7,11 +7,6 @@
 #include "fila.h"
 #include "grafo_com_lista.h"
 
-struct item_{
-    int indice;
-    item* prox;
-};
-
 struct lista_ {
     item* ini;
     item* fim;
@@ -69,6 +64,19 @@ void insere_aresta(grafo* g, int a1, int a2){
     return;
 }
 
+/* Função que insere uma aresta entre dois vertices, com peso, recebendo-os como parâmetro,
+ * junto com o grafo e com o peso. Tem retorno void */
+void insere_aresta_com_peso(grafo* g, int a1, int a2, int p, int d){
+    if(verifica_aresta(g, a1,a2) == false){
+        inserir_lista_com_peso(g->l[a1], a2, p, d);
+        if(g->direcionado == false){
+            inserir_lista_com_peso(g->l[a2], a1, p, d);
+        }
+        g->arestas++;
+    }
+    return;
+}
+
 //Função que retira uma aresta entre dois vertices, recebendo-os como parâmetro, junto com o grafo, e com retorno void
 void remove_aresta(grafo* g, int a1, int a2){
     remover_lista(g->l[a1], a2);
@@ -118,6 +126,14 @@ boolean verifica_adj(grafo* g, int v){
     else{
         return false;
     }
+}
+
+/* Funcao para retornar o peso de uma aresta em um grafo g, 
+ * entre v1 e v2, que sao recebidos por parametros.
+ * Retorna o peso. */
+
+int grafo_getPeso(grafo* g, int v1, int v2){
+    return lista_getPeso(g->l[v1], v2);
 }
 
 //Funcao auxiliar a funcao algoritmo de fleury
@@ -419,7 +435,11 @@ void busca_largura(grafo *g) {
  * cores e antecessores. Alem disso, recebe um ponteiro para o inteiro ciclo,
  * que recebe true se um ciclo eh detectado, um vetor de inteiro que ordena
  * topologicamente o grafo e um ponteiro para quantidade de elementos
- * desse vetor. Tem retorno void. */
+ * desse vetor. Tem retorno void. 
+ * Essa funcao eh utilizada para fazer a busca de profundidade, para fazer a 
+ * ordenacao topologica e para verificar um ciclo. Em cada uma dessas funcoes,
+ * sao utilizados apenas alguns dos parametros passados, o resto eh ignorado e,
+ * se alocados dinamicamente, sao liberados da memoria.*/
 
 void visita_dfs(grafo* g, int v, int* tempo, int* d, int* t, int* cor, 
                 int* ant, int* ciclo, int* vet, int* qtd){
@@ -533,3 +553,57 @@ boolean verifica_ciclo(grafo* g){
     return ciclo;
 }
 
+/* Funcao auxiliar ao algoritmo de Bellman.
+ * Recebe os dois vertices de uma aresta, o peso dela,
+ * o vetor de antecessores e de distancias por parametro.
+ * Tem retorno void*/
+
+void relaxar_aresta(int v1, int v2, int peso, int* ant, int* d){
+    if(d[v2] > d[v1] + peso){
+        d[v2] = d[v1] + peso;
+        ant[v2] = v1;
+    }
+    return;
+}
+
+/* Funcao que realiza o algoritmo de Bellman. Recebe o grafo, o vertice inicial, 
+ * o vetor das distancias e o vetor de antecessores por parametro. Tem retorno
+ * void. */
+
+void algoritmo_de_Bellman(grafo*g, int v, int* d, int* ant){
+    int p;
+    int v2;
+    
+    for(int i = 0; i < g->vertices; i++){
+        d[i] = infinito;
+        ant[i] = -1;
+    }
+    d[v] = 0;
+
+    for(int i = 0; i < (g->vertices - 1); i++){
+        for(int j = 0; j < g->vertices; j++){
+            for(int k = 0; k < lista_tamanho(g->l[j]); k++){
+                v2 = indice_lista(g->l[j], k);
+                p = lista_getDist(g->l[j], k);
+                relaxar_aresta(j, v2, p, ant, d);
+            }
+        }
+    }
+}
+
+/*
+void algoritmo_de_dijkstra(grafo* g, int v){
+    int* d = malloc(g->vertices * sizeof(int));
+    int* ant = malloc(g->vertices * sizeof(int));
+    int aux = 0;
+    
+    for(int i = 0; i < g->vertices; i++){
+        d[i] = infinito;
+        ant[i] = -1;
+    }
+    d[v] = 0;
+    LISTA* l = lista_criar();
+    inserir_lista(l, v);
+
+}
+*/

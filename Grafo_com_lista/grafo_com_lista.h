@@ -12,19 +12,21 @@
     #define preto 3
     #define e 32000
     #define sucesso 0
-
-    typedef struct item_ item;
+    #define infinito 1000000
+    
     typedef struct lista_ LISTA;
     typedef struct grafo_ grafo;
 
 
     grafo* criar_grafo(int v, boolean dir); //Cria o grafo
     void insere_aresta(grafo* g, int a1, int a2); //Insere uma aresta
+    void insere_aresta_com_peso(grafo* g, int a1, int a2, int p, int d); //Insere uma aresta com pesos p e p2
     void remove_aresta(grafo* g, int a1, int a2); //Remove uma aresta
     void apaga_grafo(grafo* g); //Apaga o grafo
     boolean verifica_aresta(grafo* g, int a1, int a2); //verifica a existencia de uma aresta entre dois vertices
     void imprime_grafo(grafo* g); //Imprime as listas de adjacencia
     boolean verifica_adj(grafo* g, int v); //Verifica se o vértice tem alguma adjacencia
+    int grafo_getPeso(grafo* g, int v1, int v2); //Retorna o peso de uma arestas
     int caminho_euleriano(grafo *g, int *vertices, int *numvertices); //Identifica um caminho euleriano
     void coloracao(grafo*g);//Colore o grafo
     void busca_largura(grafo *g); //Faz a busca em largura em g
@@ -33,5 +35,7 @@
     void remove_adj(grafo* g, int v); //Remove todas as arestas de v
     int* ordenacao_topologica(grafo* g); //Faz a ordenacao topologica do grafo g
     boolean verifica_ciclo(grafo* g); //Verifica se o grafo possui um ciclo
+    void algoritmo_de_Bellman(grafo*g, int v, int* d, int* ant); //Faz o algoritmo de Bellman
+    
     #endif
 
